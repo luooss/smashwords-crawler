@@ -17,3 +17,10 @@ class BookItem(scrapy.Item):
     content = scrapy.Field()
     detail_url = scrapy.Field()
     txt_url = scrapy.Field()
+
+    def __repr__(self):
+        ###Keep your shell clean###
+        return '\n' + repr({'title': self['title'],
+                            'author': self['author'],
+                            'word_count': self['word_count'],
+                            'txt_url': self['txt_url']}) + '\n'

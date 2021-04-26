@@ -1,0 +1,8 @@
+.DS_Store
+*.json
+*.jl
+*.log
+*.class
+
+.vscode/
+__pycache__/

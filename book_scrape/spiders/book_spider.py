@@ -8,18 +8,6 @@ class BookSpider(scrapy.Spider):
         'https://www.smashwords.com/books/category/1/downloads/0/free/any/',
     ]
 
-    # def parse(self, response):
-    #     for quote in response.xpath('//div[@class="quote"]'):
-    #         yield {
-    #             'text': quote.xpath('./span[@class="text"]/text()').extract_first(),
-    #             'author': quote.xpath('.//small[@class="author"]/text()').extract_first(),
-    #             'tags': quote.xpath('.//div[@class="tags"]/a[@class="tag"]/text()').extract()
-    #         }
-
-    #     next_page_url = response.xpath('//li[@class="next"]/a/@href').extract_first()
-    #     if next_page_url is not None:
-    #         yield scrapy.Request(response.urljoin(next_page_url))
-
     def parse(self, response):
         for book_item in response.xpath('//div[@class="library-book row p-2"]'):
             item = BookItem()
@@ -36,9 +24,14 @@ class BookSpider(scrapy.Spider):
             item['detail_url'] = book_item.xpath('.//a[@class="library-title"]/@href').get()
             yield scrapy.Request(item['detail_url'], callback=self.parse_detail, meta={'item':item})
         
-        next_page_url = response.xpath('//a[@class="page-link"]/@href').get()
+        # this is not the only one page-link is this page, attention!!!
+        # next_page_url = response.xpath('//a[@class="page-link"]/@href').get()
+        next_page_url = response.xpath('.//ul[@class="pagination"]/li[@class="page-item"][last()]/a[@class="page-link"]/@href').get()
         if next_page_url is not None:
-            yield scrapy.Request(next_page_url)
+            print('\nNext Page:\n' + '*'*90 + '\n' + next_page_url + '\n' + '*'*90 + '\n')
+            # important to use response.urljoin, otherwise may go wrong
+            # yield scrapy.Request(response.urljoin(next_page_url), callback=self.parse)
+            yield response.follow(next_page_url, callback=self.parse)
     
     def parse_detail(self, response):
         item = response.meta['item']
