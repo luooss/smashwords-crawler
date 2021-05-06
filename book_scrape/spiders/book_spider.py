@@ -4,6 +4,7 @@ import scrapy
 
 class BookSpider(scrapy.Spider):
     name = 'book_spider'
+    # allowed_domains = ['smashwords.com']
     start_urls = [
         'https://www.smashwords.com/books/category/1/downloads/0/free/any/',
     ]
@@ -35,17 +36,18 @@ class BookSpider(scrapy.Spider):
     
     def parse_detail(self, response):
         item = response.meta['item']
-        # some books don't have txt files available
+        # txt format is prefered
         post_fix = response.xpath('.//a[@title="Plain text; contains no formatting"]/@href').get()
         if(post_fix == None):
-            item['txt_url'] = 'Not available.'
-            item['content'] = 'No txt format available.'
-            yield item
+            first_format_available = response.xpath('.//div[@class="card-body"]/a[1]/@href').get()
+            item['file_urls'] = ['https://www.smashwords.com' + first_format_available]
         else: 
-            item['txt_url'] = 'https://www.smashwords.com' + post_fix
-            yield scrapy.Request(item['txt_url'], callback=self.download_txt, meta={'item':item})
-
-    def download_txt(self, response):
-        item = response.meta['item']
-        item['content'] = response.text
+            item['file_urls'] = ['https://www.smashwords.com' + post_fix]
+            # yield scrapy.Request(item['txt_url'], callback=self.download_txt, meta={'item':item})
+        
         yield item
+
+    # def download_txt(self, response):
+    #     item = response.meta['item']
+    #     item['content'] = response.text
+    #     yield item

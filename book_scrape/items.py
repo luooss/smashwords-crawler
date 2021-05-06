@@ -16,11 +16,12 @@ class BookItem(scrapy.Item):
     description = scrapy.Field()
     content = scrapy.Field()
     detail_url = scrapy.Field()
-    txt_url = scrapy.Field()
+    file_urls = scrapy.Field()
+    files = scrapy.Field()
 
     def __repr__(self):
         ###Keep your shell clean###
         return '\n' + repr({'title': self['title'],
                             'author': self['author'],
                             'word_count': self['word_count'],
-                            'txt_url': self['txt_url']}) + '\n'
+                            'file_urls': self['file_urls']}) + '\n'
