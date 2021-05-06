@@ -37,9 +37,9 @@ class BookSpider(scrapy.Spider):
     def parse_detail(self, response):
         item = response.meta['item']
         # txt format is prefered
-        post_fix = response.xpath('.//a[@title="Plain text; contains no formatting"]/@href').get()
+        post_fix = response.xpath('.//div[@id="download"]/div/a[@title="Plain text; contains no formatting"]/@href').get()
         if(post_fix == None):
-            first_format_available = response.xpath('.//div[@class="card-body"]/a[1]/@href').get()
+            first_format_available = response.xpath('.//div[@id="download"]/div/a[1]/@href').get()
             item['file_urls'] = ['https://www.smashwords.com' + first_format_available]
         else: 
             item['file_urls'] = ['https://www.smashwords.com' + post_fix]
